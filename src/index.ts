@@ -26,7 +26,8 @@ import { noteHandler } from './handlers/note/note-handler';
 import { onCancelTrashNote, onTrashNote } from './handlers/trash-bin/on-trash';
 import { folderMenu } from './menu/folder.menu';
 import { mainMenu, mainMenuText } from './menu/main.menu';
-import { noteMenu } from './menu/note.menu';
+import { noteViewerMenu } from './menu/note-viewer.menu';
+import { noteMenu, onNoNoteSearchText, onNoteSearchText } from './menu/note.menu';
 import { notifyMenu } from './menu/notify.menu';
 import { botState } from './types/bot-state';
 import { callbackEnum } from './types/callback.enum';
@@ -53,24 +54,34 @@ bot.use(
         menuId: undefined,
         lastMediaGruopId: undefined,
         editNoteId: undefined,
+        noteQuery: {
+          text: undefined,
+          folder: undefined,
+          index: 0,
+        },
+        previousNoteId: undefined,
       };
     },
   }),
 );
-
-bot.use(mainMenu);
-mainMenu.register(noteMenu);
-mainMenu.register(folderMenu);
-mainMenu.register(notifyMenu);
-
 bot.use(InlineDebugMiddleware);
 bot.use(PrismaGetUserMiddleware);
 
-bot.command('start', async (ctx) => await onStart(ctx));
-bot.command('reset', async (ctx) => await onReset(ctx));
-bot.command('menu', async (ctx) => await onNewMenu(ctx, mainMenuText, mainMenu));
+bot.use(mainMenu);
+mainMenu.register(folderMenu);
+mainMenu.register(notifyMenu);
+mainMenu.register(noteMenu);
+noteMenu.register(noteViewerMenu);
+
+bot.command('start', async (ctx: CustomContext) => await onStart(ctx));
+bot.command('reset', async (ctx: CustomContext) => await onReset(ctx));
+bot.command('menu', async (ctx: CustomContext) => await onNewMenu(ctx, mainMenuText, mainMenu));
 
 const router = new Router<CustomContext>((ctx: CustomContext) => ctx.session.state);
+
+const noteSearch = router.route(botState.noteSearch);
+noteSearch.on(':text', async (ctx) => await onNoteSearchText(ctx));
+noteSearch.on('msg', async (ctx) => await onNoNoteSearchText(ctx));
 
 const newFolder = router.route(botState.newFolder);
 newFolder.on('::bot_command', async (ctx) => await onCommandAsFolderName(ctx));
@@ -151,7 +162,7 @@ const start = async () => {
     await server.listen({ port: PORT, host: '0.0.0.0' });
     console.log('🚀 Fastify сервер запущен на http://localhost:', PORT);
 
-    await bot.start();
+    await bot.start({ drop_pending_updates: true });
     console.log('🤖 Бот запущен через polling');
   } catch (err) {
     console.error('Ошибка запуска:', err);

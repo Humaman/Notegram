@@ -1,7 +1,8 @@
 /* eslint-disable unusedImports/no-unused-vars */
 export enum botState {
   idle = 'idle',
-  editNote = 'editNote', //editNote_{noteId}
+  editNote = 'edit_note', //editNote_{noteId}
   folder = 'folder',
-  newFolder = 'newFolder',
+  newFolder = 'new_folder',
+  noteSearch = 'note_search',
 }
