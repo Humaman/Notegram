@@ -1,0 +1,92 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
+  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+}
+
+enum ReminderStatus {
+  PENDING
+  DONE
+  CANCELED
+}
+
+model User {
+  id Int @id @default(autoincrement())
+
+  tg_id      String  @unique
+  username   String?
+  first_name String?
+  last_name  String?
+
+  notes     Note[]
+  folders   Folder[]
+  reminders Reminder[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Note {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
+  folderId Int?    @unique
+
+  messageId String @unique
+
+  text    String?
+  caption String?
+  images  String?
+  videos  String?
+  audio   String?
+  doc     String?
+
+  remind Reminder?
+
+  isTrashed Boolean @default(false)
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Folder {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId Int
+
+  title String
+  notes Note[]
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}
+
+model Reminder {
+  id Int @id @default(autoincrement())
+
+  user   User @relation(fields: [userId], references: [id])
+  userId Int
+
+  status   ReminderStatus
+  remindAt DateTime
+
+  note   Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
+  noteId Int  @unique
+
+  created_at DateTime @default(now()) @map("created_at")
+  updated_at DateTime @default(now()) @updatedAt @map("updated_at")
+}

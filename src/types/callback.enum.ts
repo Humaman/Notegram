@@ -1,0 +1,20 @@
+/* eslint-disable unusedImports/no-unused-vars */
+export enum callbackEnum {
+  EDIT_NOTE_ = 'EDIT_NOTE_', //EDIT_NOTE_{messageId}
+  CANCEL_EDIT_NOTE_ = 'CANCEL_EDIT_NOTE_', //CANCEL_EDIT_NOTE_{messageId}
+
+  FOLDER_NOTE_ = 'FOLDER_NOTE_', //FOLDER_NOTE_{messageId}
+  CANCEL_FOLDER_NOTE_ = 'CANCEL_FOLDER_NOTE_', //CANCEL_FOLDER_NOTE_{messageId}
+
+  FOLDER_MENU_ = 'FOLDER_MENU_', //FOLDER_MENU_{folderId}
+  CANCEL_FOLDER_MENU_ = 'FOLDER_MENU_', //FOLDER_MENU_{folderId}
+  FOLDER_CREATE = 'FOLDER_CREATE',
+
+  ADD_NOTE_TO_FOLDER_ = 'ADD_NOTE_TO_FOLDER_', //EDIT_NOTE_{messageId}_{folderId}
+
+  NOTIFY_NOTE_ = 'NOTIFY_NOTE_', //NOTIFY_NOTE_{messageId}
+  CANCEL_NOTIFY_NOTE_ = 'CANCEL_NOTIFY_NOTE_', //CANCEL_NOTIFY_NOTE_{messageId}
+
+  TRASH_NOTE_ = 'TRASH_NOTE_', //TRASH_NOTE_{messageId}
+  CANCEL_TRASH_NOTE_ = 'CANCEL_TRASH_NOTE_', //CANCEL_TRASH_NOTE_{messageId}
+}
