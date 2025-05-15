@@ -12,7 +12,6 @@ export interface SessionData {
   // будет по `ctx.session.myContextProp`
   state: string;
   user: User;
-  menuId: string;
   lastMediaGruopId: string;
   editNoteId: string;
   noteQuery: NoteQuery;

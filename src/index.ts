@@ -56,7 +56,6 @@ bot.use(
       return {
         state: botState.idle,
         user: undefined,
-        menuId: undefined,
         lastMediaGruopId: undefined,
         editNoteId: undefined,
         noteQuery: {
