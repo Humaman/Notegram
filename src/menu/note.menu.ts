@@ -14,7 +14,9 @@ export const noteMenu = new Menu<CustomContext>('note-menu')
   .row()
   .text('📝 Веести текст', async (ctx: CustomContext) => {
     ctx.session.state = botState.noteSearch;
-    await ctx.reply('Отправьте текст, который будет использоваться при поиске заметки');
+    await ctx.reply(
+      'Отправьте текст, который будет использоваться при поиске заметки. \n\nИли отправь /cancel для отмены ввода текста',
+    );
   })
   .row()
   .text('🔙 Назад', async (ctx: CustomContext) => await noteBackToMenu(ctx))
@@ -40,6 +42,14 @@ export async function onNoNoteSearchText(ctx: CustomContext) {
     { type: 'emoji', emoji: '👎' },
   ]);
   await ctx.reply('Отправь текст для поиска');
+}
+
+export async function onCancelNoteSearchText(ctx: CustomContext) {
+  ctx.session.noteQuery.text = undefined;
+  ctx.session.state = botState.idle;
+  await ctx.api.setMessageReaction(ctx.chat.id, ctx.msg.message_id, [
+    { type: 'emoji', emoji: '👌' },
+  ]);
 }
 
 async function getFolders(ctx: CustomContext) {

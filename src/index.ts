@@ -27,7 +27,12 @@ import { onCancelTrashNote, onTrashNote } from './handlers/trash-bin/on-trash';
 import { folderMenu } from './menu/folder.menu';
 import { mainMenu, mainMenuText } from './menu/main.menu';
 import { noteViewerMenu } from './menu/note-viewer.menu';
-import { noteMenu, onNoNoteSearchText, onNoteSearchText } from './menu/note.menu';
+import {
+  noteMenu,
+  onCancelNoteSearchText,
+  onNoNoteSearchText,
+  onNoteSearchText,
+} from './menu/note.menu';
 import { notifyMenu } from './menu/notify.menu';
 import { botState } from './types/bot-state';
 import { callbackEnum } from './types/callback.enum';
@@ -80,6 +85,7 @@ bot.command('menu', async (ctx: CustomContext) => await onNewMenu(ctx, mainMenuT
 const router = new Router<CustomContext>((ctx: CustomContext) => ctx.session.state);
 
 const noteSearch = router.route(botState.noteSearch);
+noteSearch.command('cancel', async (ctx) => await onCancelNoteSearchText(ctx));
 noteSearch.on(':text', async (ctx) => await onNoteSearchText(ctx));
 noteSearch.on('msg', async (ctx) => await onNoNoteSearchText(ctx));
 
