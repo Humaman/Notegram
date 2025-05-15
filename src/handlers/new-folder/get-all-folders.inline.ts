@@ -19,7 +19,7 @@ export async function getAllFoldersInline(
 
   folders.forEach((folder) => {
     buttons.push({
-      text: `📁 ${folder.title}`,
+      text: folder.title,
       callback_data: callback + '_' + folder.id.toString(),
     });
   });
