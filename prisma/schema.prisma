@@ -20,6 +20,12 @@ enum ReminderStatus {
   CANCELED
 }
 
+enum FolderType {
+  DEFAULT
+  TRASH
+  CUSTOM
+}
+
 model User {
   id Int @id @default(autoincrement())
 
@@ -42,21 +48,19 @@ model Note {
   user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
-  folder   Folder? @relation(fields: [folderId], references: [id], onDelete: SetNull)
-  folderId Int?    @unique
+  folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
+  folderId Int
 
   messageId String @unique
 
   text    String?
   caption String?
-  images  String?
-  videos  String?
+  image   String?
+  video   String?
   audio   String?
   doc     String?
 
   remind Reminder?
-
-  isTrashed Boolean @default(false)
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")
@@ -70,6 +74,8 @@ model Folder {
 
   title String
   notes Note[]
+
+  type FolderType @default(CUSTOM)
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")

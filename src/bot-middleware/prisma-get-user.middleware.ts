@@ -1,3 +1,4 @@
+import { FolderType } from '@prisma/client';
 import { NextFunction } from 'grammy';
 
 import prisma from '../common/prisma';
@@ -25,6 +26,12 @@ export async function PrismaGetUserMiddleware(
           username: ctx.msg.from.username ? ctx.msg.from.username : undefined,
           first_name: ctx.msg.from.first_name ? ctx.msg.from.first_name : undefined,
           last_name: ctx.msg.from.last_name ? ctx.msg.from.last_name : undefined,
+          folders: {
+            create: [
+              { title: '📂 Без категории', type: FolderType.DEFAULT },
+              { title: '🗑️ Корзина', type: FolderType.TRASH },
+            ],
+          },
         },
       });
     }
