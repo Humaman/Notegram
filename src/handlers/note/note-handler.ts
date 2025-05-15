@@ -7,6 +7,21 @@ import { getNoteKb } from './note.inline';
 
 export async function noteHandler(ctx: CustomContext, noteData: NoteCreateInput) {
   console.debug('БОТ получил сообщение от пользователя', ctx.msg.from.id);
+
+  if (noteData.text && noteData.text.length > 4000) {
+    await ctx.reply(
+      'Длинна текстовой заметки не должна превышать 4000 символов. Я не смогу её добавить 😔',
+    );
+    return;
+  }
+
+  if (noteData.caption && noteData.caption.length > 928) {
+    await ctx.reply(
+      'Длинна текстовой заметки c медиа не должна превышать 928 символов. Я не смогу её добавить 😔',
+    );
+    return;
+  }
+
   const prismaCall = await tryAddNote(ctx, noteData);
 
   if (prismaCall) {
@@ -36,6 +51,9 @@ export async function sendNoteMessage(ctx: CustomContext, messageId: string) {
 
 export async function tryAddNote(ctx: CustomContext, noteData: NoteCreateInput) {
   try {
+    const folder = await prisma.folder.findFirst({
+      where: { userId: ctx.session.user.id, type: FolderType.DEFAULT },
+    });
     await prisma.note.create({
       data: {
         user: { connect: { id: ctx.session.user.id } },
