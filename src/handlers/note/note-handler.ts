@@ -1,3 +1,5 @@
+import { FolderType } from '@prisma/client';
+
 import { CustomContext } from '../../types/custom-context.interface';
 import { NoteCreateInput } from '../../types/note-create.interface';
 
@@ -37,6 +39,7 @@ export async function tryAddNote(ctx: CustomContext, noteData: NoteCreateInput) 
     await prisma.note.create({
       data: {
         user: { connect: { id: ctx.session.user.id } },
+        folder: { connect: { id: folder.id } },
         ...noteData,
       },
     });

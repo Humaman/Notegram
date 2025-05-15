@@ -1,3 +1,4 @@
+import { FolderType } from '@prisma/client';
 import { InlineKeyboard } from 'grammy';
 
 import { callbackEnum } from '../../types/callback.enum';
@@ -6,7 +7,13 @@ import { returnNoteMenu } from '../note/return-note-menu';
 
 export async function onTrashNote(ctx: CustomContext) {
   const noteMsgId = ctx.match[1];
-  await prisma.note.update({ where: { messageId: noteMsgId }, data: { isTrashed: true } });
+  const trashFolder = await prisma.folder.findFirst({
+    where: { userId: ctx.session.user.id, type: FolderType.TRASH },
+  });
+  await prisma.note.update({
+    where: { messageId: noteMsgId },
+    data: { folder: { connect: { id: trashFolder.id } } },
+  });
 
   const menuMsgId = ctx.callbackQuery.message.message_id;
 
@@ -22,8 +29,13 @@ export async function onTrashNote(ctx: CustomContext) {
 
 export async function onCancelTrashNote(ctx: CustomContext) {
   const noteMsgId = ctx.match[1];
-
-  await prisma.note.update({ where: { messageId: noteMsgId }, data: { isTrashed: false } });
+  const deafultFolder = await prisma.folder.findFirst({
+    where: { userId: ctx.session.user.id, type: FolderType.DEFAULT },
+  });
+  await prisma.note.update({
+    where: { messageId: noteMsgId },
+    data: { folder: { connect: { id: deafultFolder.id } } },
+  });
 
   await returnNoteMenu(ctx, noteMsgId);
 }
