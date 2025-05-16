@@ -21,6 +21,7 @@ import { onAddToFolder, onCancelFolderNote, onFolderNote } from './handlers/fold
 import { getNoteFromMsg } from './handlers/get-note-from-msg';
 import { isMediaGroup } from './handlers/media-group.handler';
 import { noteHandler } from './handlers/note/note-handler';
+import { onConfirmReminder } from './handlers/reminder/on-confirm-reminder';
 import {
   onBadReminderDateMessage,
   onCancelNewReminder,
@@ -88,11 +89,14 @@ noteMenu.register(noteViewerMenu);
 bot.command('start', async (ctx: CustomContext) => await onStart(ctx));
 bot.command('reset', async (ctx: CustomContext) => await onReset(ctx));
 bot.command('menu', async (ctx: CustomContext) => await onMainMenu(ctx));
+bot.callbackQuery(
+  new RegExp(`^${callbackEnum.CONFIRM_NOTIFICATION_}(\\d+)`),
+  async (ctx) => await onConfirmReminder(ctx),
+);
 
 const router = new Router<CustomContext>((ctx: CustomContext) => ctx.session.state);
 
 const reminderDate = router.route(botState.reminderDate);
-
 reminderDate.on(':text', async (ctx) => await onReminderDateMessage(ctx));
 reminderDate.on('msg', async (ctx) => await onBadReminderDateMessage(ctx));
 reminderDate.callbackQuery(
