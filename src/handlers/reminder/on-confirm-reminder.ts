@@ -11,19 +11,18 @@ export async function onConfirmReminder(ctx: CustomContext) {
 
   const text = ctx.callbackQuery?.message?.text ?? ctx.callbackQuery?.message?.caption;
 
-  const chatId = reminder.userId;
   const messageId = ctx.callbackQuery.message.message_id;
 
   if (ctx.callbackQuery?.message?.text) {
     return await ctx.api.editMessageText(
-      chatId,
+      ctx.chat.id,
       messageId,
       text + '\n' + `✔️ Подтверждено: ${reminder.updated_at}`,
       { reply_markup: null },
     );
   }
   if (ctx.callbackQuery?.message?.caption) {
-    return await ctx.api.editMessageCaption(chatId, messageId, {
+    return await ctx.api.editMessageCaption(ctx.chat.id, messageId, {
       caption: text + '\n' + `✔️ Подтверждено: ${reminder.updated_at}`,
       reply_markup: null,
     });
