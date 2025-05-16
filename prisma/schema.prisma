@@ -47,7 +47,7 @@ model Note {
   folder   Folder @relation(fields: [folderId], references: [id], onDelete: Cascade)
   folderId Int
 
-  messageId String @unique
+  messageId Int @unique
 
   text    String?
   caption String?
@@ -56,7 +56,7 @@ model Note {
   audio   String?
   doc     String?
 
-  remind Reminder?
+  reminder Reminder?
 
   created_at DateTime @default(now()) @map("created_at")
   updated_at DateTime @default(now()) @updatedAt @map("updated_at")

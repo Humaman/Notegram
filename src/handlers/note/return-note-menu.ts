@@ -4,7 +4,7 @@ import { noteReplyText } from './note-handler';
 import { getNoteKb } from './note.inline';
 
 export async function returnNoteMenu(ctx: CustomContext, noteMsgId: number, menuMessageId: number) {
-  const note = await prisma.note.findUnique({ where: { messageId: noteMsgId.toString() } });
+  const note = await prisma.note.findUnique({ where: { messageId: noteMsgId } });
   if (!note) {
     return await ctx.api.editMessageText(ctx.chat.id, Number(menuMessageId), 'Заметка удалена');
   }

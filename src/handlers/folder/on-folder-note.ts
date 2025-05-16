@@ -26,7 +26,7 @@ export async function onFolderNote(ctx: CustomContext) {
 }
 
 export async function onAddToFolder(ctx: CustomContext) {
-  const noteMessageId = ctx.session.currentNoteId.toString();
+  const noteMessageId = ctx.session.currentNoteId;
   const folderId = Number(ctx.match[1]);
 
   const note = await prisma.note.update({

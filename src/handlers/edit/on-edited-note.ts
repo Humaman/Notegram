@@ -6,7 +6,7 @@ import { sendNoteMessage } from '../note/note-handler';
 export async function onEditedNote(ctx: CustomContext, noteData: NoteCreateInput) {
   const noteId = ctx.session.currentNoteId;
 
-  const prismaCall = await tryEditNote(noteId.toString(), noteData);
+  const prismaCall = await tryEditNote(noteId, noteData);
 
   if (prismaCall) {
     const messageId = String(ctx.msg.message_id);
@@ -21,10 +21,10 @@ export async function onEditedNote(ctx: CustomContext, noteData: NoteCreateInput
   ctx.session.state = botState.idle;
 }
 
-export async function tryEditNote(noteMsgId: string, noteData: NoteCreateInput) {
+export async function tryEditNote(noteId: number, noteData: NoteCreateInput) {
   try {
     await prisma.note.update({
-      where: { messageId: noteMsgId },
+      where: { messageId: noteId },
       data: {
         ...noteData,
       },

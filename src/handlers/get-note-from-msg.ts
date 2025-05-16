@@ -2,7 +2,7 @@ import { NoteCreateInput } from '../types/note-create.interface';
 
 export function getNoteFromMsg(msg: any): NoteCreateInput {
   return {
-    messageId: String(msg.message_id),
+    messageId: msg.message_id,
     text: msg.text ?? undefined,
     caption: msg.caption ?? undefined,
     image: msg.photo ? msg.photo.at(-1)?.file_id : undefined,

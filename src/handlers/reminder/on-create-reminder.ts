@@ -15,14 +15,14 @@ export async function onNewReminder(ctx: CustomContext) {
     .text('🔙 Отмена', callbackEnum.CANCEL_NEW_REMINDER);
 
   const note = await prisma.note.findUnique({
-    where: { messageId: ctx.session.currentNoteId.toString() },
-    include: { remind: true },
+    where: { messageId: ctx.session.currentNoteId },
+    include: { reminder: true },
   });
 
   let text;
-  if (note.remind)
+  if (note.reminder)
     text =
-      `📝 У заметки есть напоминание на ${note.remind.remindAt.toLocaleString('ru-RU')}!\n\n` +
+      `📝 У заметки есть напоминание на ${note.reminder.remindAt.toLocaleString('ru-RU')}!\n\n` +
       '⏰ Вы можете изменить дату и время, нажав "📅 Ввести дату".';
   else
     text =
@@ -67,11 +67,11 @@ export async function onBadReminderDateMessage(ctx: CustomContext) {
   await ctx.reply('Не удалось распознать дату, попробуйте ещё раз 🙂');
 }
 export async function onCreateReminder(ctx: CustomContext) {
-  const noteId = ctx.session.currentNoteId.toString();
+  const noteId = ctx.session.currentNoteId;
 
   const note = await prisma.note.findUnique({
     where: { messageId: noteId },
-    include: { remind: true },
+    include: { reminder: true },
   });
 
   const data: any = {
@@ -81,7 +81,7 @@ export async function onCreateReminder(ctx: CustomContext) {
   };
 
   try {
-    if (note.remind) await prisma.reminder.update({ where: { id: note.remind.id }, data });
+    if (note.reminder) await prisma.reminder.update({ where: { id: note.reminder.id }, data });
     else await prisma.reminder.create({ data });
     await ctx.answerCallbackQuery('✅ Напоминание успешно создано');
   } catch {

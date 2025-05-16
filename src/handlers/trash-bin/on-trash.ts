@@ -13,7 +13,7 @@ export async function onTrashNote(ctx: CustomContext) {
     where: { userId: ctx.session.user.id, type: FolderType.TRASH },
   });
   await prisma.note.update({
-    where: { messageId: ctx.session.currentNoteId.toString() },
+    where: { messageId: ctx.session.currentNoteId },
     data: { folder: { connect: { id: trashFolder.id } } },
   });
 
@@ -30,7 +30,7 @@ export async function onCancelTrashNote(ctx: CustomContext) {
     where: { userId: ctx.session.user.id, type: FolderType.DEFAULT },
   });
   await prisma.note.update({
-    where: { messageId: ctx.session.currentNoteId.toString() },
+    where: { messageId: ctx.session.currentNoteId },
     data: { folder: { connect: { id: deafultFolder.id } } },
   });
 

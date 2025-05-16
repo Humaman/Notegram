@@ -1,5 +1,5 @@
 export interface NoteCreateInput {
-  messageId: string;
+  messageId: number;
 
   text?: string | null;
   caption?: string | null;
