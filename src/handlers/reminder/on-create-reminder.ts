@@ -69,6 +69,8 @@ export async function onBadReminderDateMessage(ctx: CustomContext) {
 export async function onCreateReminder(ctx: CustomContext) {
   const noteId = ctx.session.currentNoteId;
 
+  ctx.editMessageReplyMarkup({ reply_markup: null });
+
   const note = await prisma.note.findUnique({
     where: { messageId: noteId },
     include: { reminder: true },
