@@ -17,7 +17,7 @@ export async function noteHandler(ctx: CustomContext, noteData: NoteCreateInput)
 
   if (noteData.caption && noteData.caption.length > 928) {
     await ctx.reply(
-      'Длинна текстовой заметки c медиа не должна превышать 928 символов. Я не смогу её добавить 😔',
+      'Длинна заметки c медиа не должна превышать 928 символов. Я не смогу её добавить 😔',
     );
     return;
   }
@@ -34,17 +34,19 @@ export async function noteHandler(ctx: CustomContext, noteData: NoteCreateInput)
   }
 }
 
+export const noteReplyText = 'Сообщение добавлено в заметки!';
+
 export async function sendNoteMessage(ctx: CustomContext, messageId: string) {
   const kb = getNoteKb(messageId);
   try {
-    await ctx.reply('Сообщение добавлено в заметки!', {
+    await ctx.reply(noteReplyText, {
       reply_markup: kb,
       reply_parameters: { message_id: Number(messageId) },
     });
   } catch (e) {
     console.error('Ошибка при отправке ответа на заметку', e);
     await ctx.reply(
-      'Произошла ошибка при отправке ответа на заметку. Возможно вы удалили сообщение с ней...',
+      '⚠️ Произошла ошибка при отправке ответа на заметку. Возможно вы удалили сообщение с ней...',
     );
   }
 }
