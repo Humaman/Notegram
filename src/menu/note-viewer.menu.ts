@@ -1,7 +1,6 @@
 import { Menu } from '@grammyjs/menu';
 import { Note } from '@prisma/client';
 import dayjs from 'dayjs';
-import { InputMediaBuilder } from 'grammy';
 
 import { CustomContext, NoteQuery } from '../types/custom-context.interface';
 
@@ -79,26 +78,30 @@ export async function getNote(ctx: CustomContext) {
 
 export async function drawNote(ctx: CustomContext, menuId: string, note: Note | null) {
   ctx.session.previousNoteId = note.id;
-  const chatId = ctx.chat.id;
   const messageId = Number(menuId);
+  await ctx.api.deleteMessage(ctx.chat.id, messageId);
 
-  const text = noteTextWrap(note.text, note);
+  if (note.text) {
+    const text = noteTextWrap(note.text, note);
+    return ctx.reply(text, { reply_markup: noteViewerMenu });
+  }
 
-  if (note.text) return ctx.api.editMessageText(chatId, messageId, text);
+  if (note.caption) {
+    const caption = noteTextWrap(note.caption, note);
 
-  const media = createSingleMedia(note);
-  if (media) return ctx.api.editMessageMedia(chatId, messageId, media);
-}
-
-function createSingleMedia(note: Note) {
-  const { caption } = note;
-  const text = noteTextWrap(caption, note);
-  if (note.audio) return InputMediaBuilder.audio(note.audio, { caption: text });
-  if (note.video) return InputMediaBuilder.video(note.video, { caption: text });
-  if (note.image) return InputMediaBuilder.photo(note.image, { caption: text });
-  if (note.doc) return InputMediaBuilder.document(note.doc, { caption: text });
-
-  return null;
+    if (note.image) {
+      return ctx.replyWithPhoto(note.image, { caption, reply_markup: noteViewerMenu });
+    }
+    if (note.video) {
+      return ctx.replyWithVideo(note.video, { caption, reply_markup: noteViewerMenu });
+    }
+    if (note.audio) {
+      return ctx.replyWithAudio(note.audio, { caption, reply_markup: noteViewerMenu });
+    }
+    if (note.doc) {
+      return ctx.replyWithDocument(note.doc, { caption, reply_markup: noteViewerMenu });
+    }
+  }
 }
 
 function noteTextWrap(text: string, note: Note) {

@@ -3,7 +3,6 @@ import { Menu, MenuRange } from '@grammyjs/menu';
 import { botState } from '../types/bot-state';
 import { CustomContext } from '../types/custom-context.interface';
 
-import { mainMenuText } from './main.menu';
 import { tryOpenNote } from './note-viewer.menu';
 
 export const noteMenu = new Menu<CustomContext>('note-menu')
@@ -78,6 +77,7 @@ export async function noteBackToMenu(ctx: CustomContext) {
   ctx.session.noteQuery.folder = undefined;
   ctx.session.noteQuery.text = undefined;
   ctx.session.noteQuery.index = 0;
-  await ctx.api.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id, mainMenuText);
-  return ctx.menu.back();
+  ctx.session.previousNoteId = undefined;
+  await ctx.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
+  return ctx.reply(noteMenuText, { reply_markup: noteMenu });
 }

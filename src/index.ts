@@ -6,7 +6,7 @@ import { Bot, session } from 'grammy';
 import { InlineDebugMiddleware } from './bot-middleware/inline-debug-log.middleware';
 import { PrismaGetUserMiddleware } from './bot-middleware/prisma-get-user.middleware';
 import { onFolder } from './commands/folder.command';
-import { onNewMenu } from './commands/menu.command';
+import { onMainMenu } from './commands/menu.command';
 import { onReset } from './commands/reset.command';
 import { onStart } from './commands/start.command';
 import { onAddToFolder } from './handlers/add-to-folder/on-add-to-folder';
@@ -25,7 +25,7 @@ import {
 import { noteHandler } from './handlers/note/note-handler';
 import { onCancelTrashNote, onTrashNote } from './handlers/trash-bin/on-trash';
 import { folderMenu } from './menu/folder.menu';
-import { mainMenu, mainMenuText } from './menu/main.menu';
+import { mainMenu } from './menu/main.menu';
 import { noteViewerMenu } from './menu/note-viewer.menu';
 import {
   noteMenu,
@@ -79,7 +79,7 @@ noteMenu.register(noteViewerMenu);
 
 bot.command('start', async (ctx: CustomContext) => await onStart(ctx));
 bot.command('reset', async (ctx: CustomContext) => await onReset(ctx));
-bot.command('menu', async (ctx: CustomContext) => await onNewMenu(ctx, mainMenuText, mainMenu));
+bot.command('menu', async (ctx: CustomContext) => await onMainMenu(ctx));
 
 const router = new Router<CustomContext>((ctx: CustomContext) => ctx.session.state);
 

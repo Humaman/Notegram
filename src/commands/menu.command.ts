@@ -1,8 +1,6 @@
-import { Menu } from '@grammyjs/menu';
-
+import { mainMenu, mainMenuText } from '../menu/main.menu';
 import { CustomContext } from '../types/custom-context.interface';
 
-export async function onNewMenu(ctx: CustomContext, text: string, menu: Menu<CustomContext>) {
-  await ctx.deleteMessage();
-  return ctx.reply(text, { reply_markup: menu });
+export async function onMainMenu(ctx: CustomContext) {
+  return ctx.reply(mainMenuText, { reply_markup: mainMenu });
 }
