@@ -17,13 +17,13 @@ export async function onConfirmReminder(ctx: CustomContext) {
     return await ctx.api.editMessageText(
       ctx.chat.id,
       messageId,
-      text + '\n' + `✔️ Подтверждено: ${reminder.updated_at}`,
+      text + '\n' + `✔️ Подтверждено: ${reminder.updated_at.toLocaleString('ru-RU')}`,
       { reply_markup: null },
     );
   }
   if (ctx.callbackQuery?.message?.caption) {
     return await ctx.api.editMessageCaption(ctx.chat.id, messageId, {
-      caption: text + '\n' + `✔️ Подтверждено: ${reminder.updated_at}`,
+      caption: text + '\n' + `✔️ Подтверждено: ${reminder.updated_at.toLocaleString('ru-RU')}`,
       reply_markup: null,
     });
   }
