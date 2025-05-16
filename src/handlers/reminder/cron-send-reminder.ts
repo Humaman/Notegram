@@ -12,20 +12,20 @@ export async function cronSendReminder(
 ) {
   const kb = getReminderKb(reminder.id);
 
-  if (note.text) {
+  if (note?.text) {
     const text = reminderTextWrap(note.text, reminder);
-    return await bot.api.sendMessage(note.id, text, { reply_markup: kb });
+    return await bot.api.sendMessage(userTgId, text, { reply_markup: kb });
   }
 
-  if (note.caption) {
+  if (note?.caption) {
     const caption = reminderTextWrap(note.caption, reminder);
-    if (note.image)
+    if (note?.image)
       return await bot.api.sendPhoto(userTgId, note.image, { caption, reply_markup: kb });
-    if (note.video)
+    if (note?.video)
       return await bot.api.sendVideo(userTgId, note.video, { caption, reply_markup: kb });
-    if (note.audio)
+    if (note?.audio)
       return await bot.api.sendAudio(userTgId, note.audio, { caption, reply_markup: kb });
-    if (note.doc)
+    if (note?.doc)
       return await bot.api.sendDocument(userTgId, note.doc, { caption, reply_markup: kb });
   }
 }
