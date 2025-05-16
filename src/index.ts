@@ -9,6 +9,7 @@ import { onFolder } from './commands/folder.command';
 import { onMainMenu } from './commands/menu.command';
 import { onReset } from './commands/reset.command';
 import { onStart } from './commands/start.command';
+import { startBotMessageScheduler } from './common/cron';
 import { cancelEdit, noteEditHandler } from './handlers/edit/edit-note-handler';
 import { onEditedNote } from './handlers/edit/on-edited-note';
 import {
@@ -184,6 +185,8 @@ server.setErrorHandler(async (error) => {
 server.get('/', async (req: FastifyRequest, reply: FastifyReply) => {
   return { status: 'ok', message: 'Бот работает' };
 });
+
+startBotMessageScheduler(bot);
 
 const start = async () => {
   try {
