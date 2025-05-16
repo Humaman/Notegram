@@ -16,8 +16,8 @@ datasource db {
 
 enum ReminderStatus {
   PENDING
-  DONE
-  CANCELED
+  SENT
+  CONFIRMED
 }
 
 enum FolderType {
@@ -29,11 +29,7 @@ enum FolderType {
 model User {
   id Int @id @default(autoincrement())
 
-  tg_id      String  @unique
-  username   String?
-  first_name String?
-  last_name  String?
-
+  tg_id     String     @unique
   notes     Note[]
   folders   Folder[]
   reminders Reminder[]
@@ -87,8 +83,9 @@ model Reminder {
   user   User @relation(fields: [userId], references: [id])
   userId Int
 
-  status   ReminderStatus
-  remindAt DateTime
+  remindAt   DateTime
+  status     ReminderStatus @default(PENDING)
+  retryCount Int            @default(0)
 
   note   Note @relation(fields: [noteId], references: [id], onDelete: Cascade)
   noteId Int  @unique

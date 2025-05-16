@@ -1,6 +1,6 @@
 import { InlineKeyboard } from 'grammy';
 
-import { getAllFoldersInline } from '../handlers/new-folder/get-all-folders.inline';
+import { getAllFoldersInline } from '../handlers/folder/get-all-folders.inline';
 import { botState } from '../types/bot-state';
 import { callbackEnum } from '../types/callback.enum';
 import { CustomContext } from '../types/custom-context.interface';

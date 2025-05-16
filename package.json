@@ -17,10 +17,11 @@
     "@grammyjs/router": "^2.0.0",
     "@prisma/client": "^6.7.0",
     "axios": "^1.8.4",
-    "dayjs": "^1.11.13",
+    "chrono-node": "^2.8.0",
     "dotenv": "^16.4.7",
     "fastify": "^5.3.2",
-    "grammy": "^1.35.1"
+    "grammy": "^1.35.1",
+    "node-cron": "^4.0.5"
   },
   "devDependencies": {
     "@eslint/compat": "^1.2.8",

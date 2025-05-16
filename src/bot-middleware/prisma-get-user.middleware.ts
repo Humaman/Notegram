@@ -23,9 +23,6 @@ export async function PrismaGetUserMiddleware(
       user = await prisma.user.create({
         data: {
           tg_id: tgId,
-          username: ctx.msg.from.username ? ctx.msg.from.username : undefined,
-          first_name: ctx.msg.from.first_name ? ctx.msg.from.first_name : undefined,
-          last_name: ctx.msg.from.last_name ? ctx.msg.from.last_name : undefined,
           folders: {
             create: [
               { title: '📂 Без категории', type: FolderType.DEFAULT },

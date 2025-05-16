@@ -12,9 +12,11 @@ export interface SessionData {
   // будет по `ctx.session.myContextProp`
   state: string;
   user: User;
+  currentNoteId: number;
+  currentMenuId: number;
   lastMediaGruopId: string;
-  editNoteId: string;
   noteQuery: NoteQuery;
   previousNoteId: number;
+  reminderDate: Date;
 }
 export type CustomContext = Context & SessionFlavor<SessionData> & MenuFlavor;

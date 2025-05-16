@@ -20,13 +20,16 @@ export async function onFolderName(ctx: CustomContext) {
 }
 
 export async function onBadFolderName(ctx: CustomContext) {
-  return ctx.reply('Пожалуйста отправьте сообщение с название папки длинной не более 32 символов', {
-    reply_parameters: { message_id: ctx.msg.message_id },
-  });
+  return await ctx.reply(
+    'Пожалуйста отправьте сообщение с название папки длинной не более 32 символов',
+    {
+      reply_parameters: { message_id: ctx.msg.message_id },
+    },
+  );
 }
 
 export async function onCommandAsFolderName(ctx: CustomContext) {
-  return ctx.reply('Пожалуйста не используйте команды как название папки', {
+  return await ctx.reply('Пожалуйста не используйте команды как название папки', {
     reply_parameters: { message_id: ctx.msg.message_id },
   });
 }

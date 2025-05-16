@@ -1,6 +1,5 @@
 import { Menu } from '@grammyjs/menu';
 import { Note } from '@prisma/client';
-import dayjs from 'dayjs';
 
 import { CustomContext, NoteQuery } from '../types/custom-context.interface';
 
@@ -105,10 +104,8 @@ export async function drawNote(ctx: CustomContext, menuId: string, note: Note | 
 }
 
 function noteTextWrap(text: string, note: Note) {
-  const dateFormat = 'HH:mm DD-MM-YYYY';
-
-  const formatedCreatedAt = dayjs(note.created_at).format(dateFormat);
-  const formatedUpdatedAt = dayjs(note.updated_at).format(dateFormat);
+  const formatedCreatedAt = note.created_at.toLocaleString('ru-RU');
+  const formatedUpdatedAt = note.updated_at.toLocaleString('ru-RU');
 
   const wrapedText =
     `Заметка #${note.id}\n\n` +

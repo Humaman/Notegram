@@ -9,20 +9,25 @@ import { onFolder } from './commands/folder.command';
 import { onMainMenu } from './commands/menu.command';
 import { onReset } from './commands/reset.command';
 import { onStart } from './commands/start.command';
-import { onAddToFolder } from './handlers/add-to-folder/on-add-to-folder';
-import { onCancelFolderNote } from './handlers/add-to-folder/on-cancel-folder-note';
-import { onFolderNote } from './handlers/add-to-folder/on-folder-note';
-import { cancelEdit } from './handlers/edit/cancel-edit-note';
-import { noteEditHandler } from './handlers/edit/edit-note-handler';
+import { cancelEdit, noteEditHandler } from './handlers/edit/edit-note-handler';
 import { onEditedNote } from './handlers/edit/on-edited-note';
-import { getNoteFromMsg } from './handlers/get-note-from-msg';
-import { isMediaGroup } from './handlers/media-group.handler';
 import {
   onFolderName,
   onBadFolderName,
   onCommandAsFolderName,
-} from './handlers/new-folder/on-folder-name';
+} from './handlers/folder/on-folder-name';
+import { onAddToFolder, onCancelFolderNote, onFolderNote } from './handlers/folder/on-folder-note';
+import { getNoteFromMsg } from './handlers/get-note-from-msg';
+import { isMediaGroup } from './handlers/media-group.handler';
 import { noteHandler } from './handlers/note/note-handler';
+import {
+  onBadReminderDateMessage,
+  onCancelNewReminder,
+  onCreateReminder,
+  onEnterNewReminderDate,
+  onNewReminder,
+  onReminderDateMessage,
+} from './handlers/reminder/on-create-reminder';
 import { onCancelTrashNote, onTrashNote } from './handlers/trash-bin/on-trash';
 import { folderMenu } from './menu/folder.menu';
 import { mainMenu } from './menu/main.menu';
@@ -57,13 +62,15 @@ bot.use(
         state: botState.idle,
         user: undefined,
         lastMediaGruopId: undefined,
-        editNoteId: undefined,
+        currentNoteId: undefined,
+        currentMenuId: undefined,
         noteQuery: {
           text: undefined,
           folder: undefined,
           index: 0,
         },
         previousNoteId: undefined,
+        reminderDate: undefined,
       };
     },
   }),
@@ -83,6 +90,19 @@ bot.command('menu', async (ctx: CustomContext) => await onMainMenu(ctx));
 
 const router = new Router<CustomContext>((ctx: CustomContext) => ctx.session.state);
 
+const reminderDate = router.route(botState.reminderDate);
+
+reminderDate.on(':text', async (ctx) => await onReminderDateMessage(ctx));
+reminderDate.on('msg', async (ctx) => await onBadReminderDateMessage(ctx));
+reminderDate.callbackQuery(
+  callbackEnum.CREATE_REMINDER,
+  async (ctx) => await onCreateReminder(ctx),
+);
+reminderDate.callbackQuery(
+  callbackEnum.CANCEL_NEW_REMINDER,
+  async (ctx) => await onCancelNewReminder(ctx),
+);
+
 const noteSearch = router.route(botState.noteSearch);
 noteSearch.command('cancel', async (ctx) => await onCancelNoteSearchText(ctx));
 noteSearch.on(':text', async (ctx) => await onNoteSearchText(ctx));
@@ -100,10 +120,23 @@ editNote.on([':text', ':photo', ':video', ':audio', ':document'], async (ctx) =>
   await onEditedNote(ctx, note);
 });
 editNote.on('msg', async (ctx) => await ctx.reply('Этот вид файлов не поддерживается ботом 😔'));
+editNote.callbackQuery(callbackEnum.CANCEL_EDIT_NOTE, async (ctx) => await cancelEdit(ctx));
 
 const idle = router.route(botState.idle);
 //COMMANDS
+//TODO убрать
 idle.command('folder', async (ctx) => await onFolder(ctx));
+
+//NEW REMINDER HANDLERS
+idle.callbackQuery(
+  new RegExp(`^${callbackEnum.NEW_REMINDER_}(\\d+)`),
+  async (ctx) => await onNewReminder(ctx),
+);
+idle.callbackQuery(callbackEnum.CANCEL_NEW_REMINDER, async (ctx) => await onCancelNewReminder(ctx));
+idle.callbackQuery(
+  new RegExp(`^${callbackEnum.ENTER_REMINDER_DATE}`),
+  async (ctx) => await onEnterNewReminderDate(ctx),
+);
 
 //FOLDER HANDLERS
 idle.callbackQuery(
@@ -111,10 +144,7 @@ idle.callbackQuery(
   async (ctx) => await onFolderNote(ctx),
 );
 
-idle.callbackQuery(
-  new RegExp(`^${callbackEnum.CANCEL_FOLDER_NOTE_}(\\d+)`),
-  async (ctx) => await onCancelFolderNote(ctx),
-);
+idle.callbackQuery(callbackEnum.CANCEL_FOLDER_NOTE, async (ctx) => await onCancelFolderNote(ctx));
 
 idle.callbackQuery(
   new RegExp(`^${callbackEnum.ADD_NOTE_TO_FOLDER_}(\\d+)_(\\d+)`),
@@ -126,20 +156,13 @@ idle.callbackQuery(
   new RegExp(`^${callbackEnum.EDIT_NOTE_}(\\d+)`),
   async (ctx) => await noteEditHandler(ctx),
 );
-idle.callbackQuery(
-  new RegExp(`^${callbackEnum.CANCEL_EDIT_NOTE_}(\\d+)`),
-  async (ctx) => await cancelEdit(ctx),
-);
 
 //TRASH NOTE HANDLERS
 idle.callbackQuery(
   new RegExp(`^${callbackEnum.TRASH_NOTE_}(\\d+)`),
   async (ctx) => await onTrashNote(ctx),
 );
-idle.callbackQuery(
-  new RegExp(`^${callbackEnum.CANCEL_TRASH_NOTE_}(\\d+)`),
-  async (ctx) => await onCancelTrashNote(ctx),
-);
+idle.callbackQuery(callbackEnum.CANCEL_TRASH_NOTE, async (ctx) => await onCancelTrashNote(ctx));
 
 //NEW NOTE HANDLERS
 idle.on([':text', ':photo', ':video', ':audio', ':document'], async (ctx) => {
@@ -167,7 +190,7 @@ const start = async () => {
     await server.listen({ port: PORT, host: '0.0.0.0' });
     console.log('🚀 Fastify сервер запущен на http://localhost:', PORT);
 
-    await bot.start({ drop_pending_updates: true });
+    await bot.start({ drop_pending_updates: false });
     console.log('🤖 Бот запущен через polling');
   } catch (err) {
     console.error('Ошибка запуска:', err);

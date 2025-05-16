@@ -31,7 +31,7 @@ export function getEditNoteInline(messageId: string): InlineKeyboardButton {
 export function getCreateNotificationInline(messageId: string): InlineKeyboardButton {
   const button = {
     text: `⏰ Создать напоминание`,
-    callback_data: `${callbackEnum.NOTIFY_NOTE_}${messageId}`,
+    callback_data: `${callbackEnum.NEW_REMINDER_}${messageId}`,
   };
   return button;
 }
