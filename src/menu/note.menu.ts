@@ -3,6 +3,7 @@ import { Menu, MenuRange } from '@grammyjs/menu';
 import { botState } from '../types/bot-state';
 import { CustomContext } from '../types/custom-context.interface';
 
+import { backToMenu } from './main.menu';
 import { tryOpenNote } from './note-viewer.menu';
 
 export const noteMenu = new Menu<CustomContext>('note-menu')
@@ -18,7 +19,7 @@ export const noteMenu = new Menu<CustomContext>('note-menu')
     );
   })
   .row()
-  .text('🔙 Назад', async (ctx: CustomContext) => await noteBackToMenu(ctx))
+  .text('🔙 Назад', async (ctx: CustomContext) => await backToMenu(ctx))
   .row()
   .text('🗂️ Все папки', async (ctx: CustomContext) => {
     ctx.session.noteQuery.folder = undefined;
@@ -72,12 +73,3 @@ export const noteMenuText =
   '📋 Меню заметок.\n\n' +
   'Укажие текст для поиска и папку \n(По умолчанию откроется последняя заметка)\n\n' +
   '📌 Выберите интересующую папку на клавиатуре:';
-
-export async function noteBackToMenu(ctx: CustomContext) {
-  ctx.session.noteQuery.folder = undefined;
-  ctx.session.noteQuery.text = undefined;
-  ctx.session.noteQuery.index = 0;
-  ctx.session.previousNoteId = undefined;
-  await ctx.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
-  return ctx.reply(noteMenuText, { reply_markup: noteMenu });
-}

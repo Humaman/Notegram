@@ -4,7 +4,7 @@ import dayjs from 'dayjs';
 
 import { CustomContext, NoteQuery } from '../types/custom-context.interface';
 
-import { noteBackToMenu } from './note.menu';
+import { noteMenu, noteMenuText } from './note.menu';
 
 export const noteViewerMenu = new Menu<CustomContext>('note-viewer-menu')
   .text('⬅️', async (ctx: CustomContext) => await prevNote(ctx))
@@ -116,4 +116,13 @@ function noteTextWrap(text: string, note: Note) {
     text +
     `\n\n🌱 Создана ${formatedCreatedAt}\n✏️ Обновлена: ${formatedUpdatedAt}`;
   return wrapedText;
+}
+
+export async function noteBackToMenu(ctx: CustomContext) {
+  ctx.session.noteQuery.folder = undefined;
+  ctx.session.noteQuery.text = undefined;
+  ctx.session.noteQuery.index = 0;
+  ctx.session.previousNoteId = undefined;
+  await ctx.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
+  return ctx.reply(noteMenuText, { reply_markup: noteMenu });
 }
