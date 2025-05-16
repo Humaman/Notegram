@@ -5,7 +5,7 @@ import { getNoteKb } from './note.inline';
 export async function returnNoteMenu(ctx: CustomContext, noteMsgId: string) {
   const note = await prisma.note.findUnique({ where: { messageId: noteMsgId } });
   if (!note) {
-    return ctx.editMessageText('Заметка удалена');
+    return await ctx.editMessageText('Заметка удалена');
   }
   const kb = getNoteKb(noteMsgId);
   try {

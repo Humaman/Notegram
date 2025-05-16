@@ -83,23 +83,23 @@ export async function drawNote(ctx: CustomContext, menuId: string, note: Note | 
 
   if (note.text) {
     const text = noteTextWrap(note.text, note);
-    return ctx.reply(text, { reply_markup: noteViewerMenu });
+    return await ctx.reply(text, { reply_markup: noteViewerMenu });
   }
 
   if (note.caption) {
     const caption = noteTextWrap(note.caption, note);
 
     if (note.image) {
-      return ctx.replyWithPhoto(note.image, { caption, reply_markup: noteViewerMenu });
+      return await ctx.replyWithPhoto(note.image, { caption, reply_markup: noteViewerMenu });
     }
     if (note.video) {
-      return ctx.replyWithVideo(note.video, { caption, reply_markup: noteViewerMenu });
+      return await ctx.replyWithVideo(note.video, { caption, reply_markup: noteViewerMenu });
     }
     if (note.audio) {
-      return ctx.replyWithAudio(note.audio, { caption, reply_markup: noteViewerMenu });
+      return await ctx.replyWithAudio(note.audio, { caption, reply_markup: noteViewerMenu });
     }
     if (note.doc) {
-      return ctx.replyWithDocument(note.doc, { caption, reply_markup: noteViewerMenu });
+      return await ctx.replyWithDocument(note.doc, { caption, reply_markup: noteViewerMenu });
     }
   }
 }
@@ -107,7 +107,6 @@ export async function drawNote(ctx: CustomContext, menuId: string, note: Note | 
 function noteTextWrap(text: string, note: Note) {
   const dateFormat = 'HH:mm DD-MM-YYYY';
 
-  // Форматируем даты с помощью dayjs
   const formatedCreatedAt = dayjs(note.created_at).format(dateFormat);
   const formatedUpdatedAt = dayjs(note.updated_at).format(dateFormat);
 
@@ -124,5 +123,5 @@ export async function noteBackToMenu(ctx: CustomContext) {
   ctx.session.noteQuery.index = 0;
   ctx.session.previousNoteId = undefined;
   await ctx.api.deleteMessage(ctx.chat.id, ctx.callbackQuery.message.message_id);
-  return ctx.reply(noteMenuText, { reply_markup: noteMenu });
+  return await ctx.reply(noteMenuText, { reply_markup: noteMenu });
 }

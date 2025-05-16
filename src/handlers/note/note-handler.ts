@@ -28,7 +28,7 @@ export async function noteHandler(ctx: CustomContext, noteData: NoteCreateInput)
     const messageId = String(ctx.msg.message_id);
     return sendNoteMessage(ctx, messageId);
   } else {
-    return ctx.reply(
+    return await ctx.reply(
       '⚠️ Произошла ошибка при добавлении заметки. Пожалуйста, попробуйте еще раз позже.',
     );
   }
