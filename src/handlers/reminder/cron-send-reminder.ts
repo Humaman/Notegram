@@ -42,6 +42,6 @@ function reminderTextWrap(text: string, reminder: Reminder) {
 export function getReminderKb(reminderId: number): InlineKeyboard {
   return new InlineKeyboard().text(
     '✅ Подтвердить',
-    ` ${callbackEnum.CONFIRM_NOTIFICATION_}${reminderId}`,
+    `${callbackEnum.CONFIRM_NOTIFICATION_}${reminderId}`,
   );
 }
