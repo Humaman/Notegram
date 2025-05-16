@@ -69,8 +69,6 @@ export async function onBadReminderDateMessage(ctx: CustomContext) {
 export async function onCreateReminder(ctx: CustomContext) {
   const noteId = ctx.session.currentNoteId;
 
-  ctx.editMessageReplyMarkup({ reply_markup: null });
-
   const note = await prisma.note.findUnique({
     where: { messageId: noteId },
     include: { reminder: true },
@@ -83,8 +81,16 @@ export async function onCreateReminder(ctx: CustomContext) {
   };
 
   try {
-    if (note.reminder) await prisma.reminder.update({ where: { id: note.reminder.id }, data });
-    else await prisma.reminder.create({ data });
+    let reminder;
+    if (note.reminder)
+      reminder = await prisma.reminder.update({ where: { id: note.reminder.id }, data });
+    else reminder = await prisma.reminder.create({ data });
+    await ctx.api.editMessageText(
+      ctx.chat.id,
+      ctx.callbackQuery.message.message_id,
+      `✅ Напоминание на ${reminder.remindAt.toLocaleString('ru-RU')} успешно создано`,
+      { reply_markup: null },
+    );
     await ctx.answerCallbackQuery('✅ Напоминание успешно создано');
   } catch {
     await ctx.reply('⚠️ Не удалось создать напоминание, пожалуйста попробуйте снова');
