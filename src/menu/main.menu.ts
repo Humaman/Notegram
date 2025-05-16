@@ -24,6 +24,9 @@ async function openMenu(ctx: CustomContext, subMenuName: string, subMenuText: st
 
 export async function backToMenu(ctx: CustomContext) {
   await ctx.api.editMessageText(ctx.chat.id, ctx.callbackQuery.message.message_id, mainMenuText);
+  ctx.session.noteQuery.folder = undefined;
+  ctx.session.noteQuery.text = undefined;
+  ctx.session.noteQuery.index = 0;
   return ctx.menu.back();
 }
 

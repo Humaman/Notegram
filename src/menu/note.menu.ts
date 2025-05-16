@@ -8,8 +8,8 @@ import { tryOpenNote } from './note-viewer.menu';
 
 export const noteMenu = new Menu<CustomContext>('note-menu')
   .text('🔍 Выполнить поиск', async (ctx: CustomContext) => {
-    if (await tryOpenNote(ctx)) return ctx.menu.nav('note-viewer-menu');
-    else return await ctx.reply('По этому запросу нет заметок.');
+    const isNotes = await tryOpenNote(ctx);
+    if (!isNotes) return await ctx.reply('По этому запросу нет заметок.');
   })
   .row()
   .text('📝 Веести текст', async (ctx: CustomContext) => {
