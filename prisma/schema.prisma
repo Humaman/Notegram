@@ -26,10 +26,28 @@ enum FolderType {
   CUSTOM
 }
 
-model User {
-  id Int @id @default(autoincrement())
+model AuthCode {
+  id          String   @id @default(uuid()) // Сам код авторизации как UUID
+  code        String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userId      Int
+  clientId    String
+  redirectUri String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+}
 
-  tg_id     String     @unique
+model User {
+  id Int @id @unique @default(autoincrement())
+
+  tg_id String @unique
+
+  yandex_id        String  @unique
+  yandex_password  String  @unique
+  yandex_id_active Boolean @default(false)
+
+  authCodes AuthCode[]
+
   notes     Note[]
   folders   Folder[]
   reminders Reminder[]
@@ -80,7 +98,7 @@ model Folder {
 model Reminder {
   id Int @id @default(autoincrement())
 
-  user   User @relation(fields: [userId], references: [id])
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId Int
 
   remindAt   DateTime

@@ -1,6 +1,6 @@
-import { FolderType } from '@prisma/client';
 import { NextFunction } from 'grammy';
 
+import { createUser } from '../../common/create-user';
 import prisma from '../common/prisma';
 import { CustomContext } from '../types/custom-context.interface';
 
@@ -20,20 +20,9 @@ export async function PrismaGetUserMiddleware(
     });
 
     if (!user) {
-      user = await prisma.user.create({
-        data: {
-          tg_id: tgId,
-          folders: {
-            create: [
-              { title: '📂 Без категории', type: FolderType.DEFAULT },
-              { title: '🗑️ Корзина', type: FolderType.TRASH },
-            ],
-          },
-        },
-      });
+      user = await createUser(tgId);
+      ctx.session.user = user;
     }
-
-    ctx.session.user = user;
+    await next();
   }
-  await next();
 }

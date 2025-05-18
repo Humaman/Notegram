@@ -1,27 +1,32 @@
+import fastifyFormbody from '@fastify/formbody';
 import { Router } from '@grammyjs/router';
 import dotenv from 'dotenv';
 import fastify, { FastifyReply, FastifyRequest } from 'fastify';
 import { Bot, session } from 'grammy';
 
-import { InlineDebugMiddleware } from './bot-middleware/inline-debug-log.middleware';
-import { PrismaGetUserMiddleware } from './bot-middleware/prisma-get-user.middleware';
-import { onFolder } from './commands/folder.command';
-import { onMainMenu } from './commands/menu.command';
-import { onReset } from './commands/reset.command';
-import { onStart } from './commands/start.command';
-import { startBotMessageScheduler } from './common/cron';
-import { cancelEdit, noteEditHandler } from './handlers/edit/edit-note-handler';
-import { onEditedNote } from './handlers/edit/on-edited-note';
+import { InlineDebugMiddleware } from './telegram/bot-middleware/inline-debug-log.middleware';
+import { PrismaGetUserMiddleware } from './telegram/bot-middleware/prisma-get-user.middleware';
+import { onFolder } from './telegram/commands/folder.command';
+import { onMainMenu } from './telegram/commands/menu.command';
+import { onReset } from './telegram/commands/reset.command';
+import { onStart } from './telegram/commands/start.command';
+import { startBotMessageScheduler } from './telegram/common/cron';
+import { cancelEdit, noteEditHandler } from './telegram/handlers/edit/edit-note-handler';
+import { onEditedNote } from './telegram/handlers/edit/on-edited-note';
 import {
   onFolderName,
   onBadFolderName,
   onCommandAsFolderName,
-} from './handlers/folder/on-folder-name';
-import { onAddToFolder, onCancelFolderNote, onFolderNote } from './handlers/folder/on-folder-note';
-import { getNoteFromMsg } from './handlers/get-note-from-msg';
-import { isMediaGroup } from './handlers/media-group.handler';
-import { noteHandler } from './handlers/note/note-handler';
-import { onConfirmReminder } from './handlers/reminder/on-confirm-reminder';
+} from './telegram/handlers/folder/on-folder-name';
+import {
+  onAddToFolder,
+  onCancelFolderNote,
+  onFolderNote,
+} from './telegram/handlers/folder/on-folder-note';
+import { getNoteFromMsg } from './telegram/handlers/get-note-from-msg';
+import { isMediaGroup } from './telegram/handlers/media-group.handler';
+import { noteHandler } from './telegram/handlers/note/note-handler';
+import { onConfirmReminder } from './telegram/handlers/reminder/on-confirm-reminder';
 import {
   onBadReminderDateMessage,
   onCancelNewReminder,
@@ -29,21 +34,24 @@ import {
   onEnterNewReminderDate,
   onNewReminder,
   onReminderDateMessage,
-} from './handlers/reminder/on-create-reminder';
-import { onCancelTrashNote, onTrashNote } from './handlers/trash-bin/on-trash';
-import { folderMenu } from './menu/folder.menu';
-import { mainMenu } from './menu/main.menu';
-import { noteViewerMenu } from './menu/note-viewer.menu';
+} from './telegram/handlers/reminder/on-create-reminder';
+import { onCancelTrashNote, onTrashNote } from './telegram/handlers/trash-bin/on-trash';
+import { folderMenu } from './telegram/menu/folder.menu';
+import { mainMenu } from './telegram/menu/main.menu';
+import { noteViewerMenu } from './telegram/menu/note-viewer.menu';
 import {
   noteMenu,
   onCancelNoteSearchText,
   onNoNoteSearchText,
   onNoteSearchText,
-} from './menu/note.menu';
-import { notifyMenu } from './menu/notify.menu';
-import { botState } from './types/bot-state';
-import { callbackEnum } from './types/callback.enum';
-import { CustomContext, SessionData } from './types/custom-context.interface';
+} from './telegram/menu/note.menu';
+import { notifyMenu } from './telegram/menu/notify.menu';
+import { botState } from './telegram/types/bot-state';
+import { callbackEnum } from './telegram/types/callback.enum';
+import { CustomContext, SessionData } from './telegram/types/custom-context.interface';
+import { getAuth } from './yandex/auth/get-auth';
+import { postAuth } from './yandex/auth/post-auth';
+import { postToken } from './yandex/post-token';
 
 dotenv.config();
 const TOKEN = process.env.TG_BOT_TOKEN;
@@ -54,6 +62,7 @@ if (!TOKEN) {
 
 // Fastify server instance
 const server = fastify({ logger: true });
+server.register(fastifyFormbody);
 
 const bot = new Bot<CustomContext>(TOKEN);
 
@@ -185,9 +194,25 @@ server.setErrorHandler(async (error) => {
   console.error(error);
 });
 
+server.post('/', async (request, reply) => {
+  const payload: any = request.body;
+
+  if (payload.session.new) {
+    return reply.send({
+      start_account_linking: {},
+      version: '1.0',
+    });
+  }
+});
+
+server.get('/auth', async (req, reply) => await getAuth(req, reply));
+server.post('/auth', async (req, reply) => await postAuth(req, reply));
+
+server.post('/token', async (req, reply) => await postToken(req, reply));
+
 // eslint-disable-next-line unusedImports/no-unused-vars
 server.get('/', async (req: FastifyRequest, reply: FastifyReply) => {
-  return { status: 'ok', message: 'Бот работает' };
+  return { status: 'ok', message: 'Сервер работает' };
 });
 
 startBotMessageScheduler(bot);
