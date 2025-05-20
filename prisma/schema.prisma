@@ -10,24 +10,24 @@ generator client {
 
 datasource db {
   provider  = "postgresql"
-  url       = env("POSTGRES_PRISMA_URL") // uses connection pooling
-  directUrl = env("POSTGRES_URL_NON_POOLING") // uses a direct connection
+  url       = env("POSTGRES_PRISMA_URL")
+  directUrl = env("POSTGRES_URL_NON_POOLING")
 }
 
 enum ReminderStatus {
-  PENDING
-  SENT
-  CONFIRMED
+  PENDING // напоминание ожидает отправки
+  SENT // напоминание отправлено, но ещё не подтверждено
+  CONFIRMED // напоминание подтверждено пользователем
 }
 
 enum FolderType {
-  DEFAULT
-  TRASH
-  CUSTOM
+  DEFAULT // стандартная папка для заметок
+  TRASH // папка для удалённых заметок
+  CUSTOM // пользовательская папка, создаваемая вручную
 }
 
 model AuthCode {
-  id          String   @id @default(uuid()) // Сам код авторизации как UUID
+  id          String   @id @default(uuid())
   code        String   @unique
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   userId      Int
@@ -42,12 +42,9 @@ model User {
 
   tg_id String @unique
 
-  yandex_id        String  @unique
-  yandex_password  String  @unique
-  yandex_id_active Boolean @default(false)
+  yandex_password String @unique
 
   authCodes AuthCode[]
-
   notes     Note[]
   folders   Folder[]
   reminders Reminder[]

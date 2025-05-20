@@ -9,14 +9,14 @@ export interface NoteQuery {
 }
 
 export interface SessionData {
-  // будет по `ctx.session.myContextProp`
-  state: string;
-  user: User;
-  currentNoteId: number;
-  currentMenuId: number;
-  lastMediaGruopId: string;
-  noteQuery: NoteQuery;
-  previousNoteId: number;
-  reminderDate: Date;
+  state: string; // текущее состояние взаимодействия (например, "создание заметки")
+  user: User; // объект пользователя
+  currentNoteId: number; // ID текущей заметки
+  currentMenuId: number; // ID текущего активного меню
+  lastMediaGruopId: string; // последний ID группы медиа (например, при загрузке фото)
+  noteQuery: NoteQuery; // параметры текущего поиска заметок
+  previousNoteId: number; // ID предыдущей заметки, для навигации
+  reminderDate: Date; // дата напоминания, если установлена
 }
+
 export type CustomContext = Context & SessionFlavor<SessionData> & MenuFlavor;

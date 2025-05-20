@@ -6,7 +6,6 @@ import { Bot, session } from 'grammy';
 
 import { InlineDebugMiddleware } from './telegram/bot-middleware/inline-debug-log.middleware';
 import { PrismaGetUserMiddleware } from './telegram/bot-middleware/prisma-get-user.middleware';
-import { onFolder } from './telegram/commands/folder.command';
 import { onMainMenu } from './telegram/commands/menu.command';
 import { onReset } from './telegram/commands/reset.command';
 import { onStart } from './telegram/commands/start.command';
@@ -51,16 +50,16 @@ import { callbackEnum } from './telegram/types/callback.enum';
 import { CustomContext, SessionData } from './telegram/types/custom-context.interface';
 import { getAuth } from './yandex/auth/get-auth';
 import { postAuth } from './yandex/auth/post-auth';
-import { postToken } from './yandex/post-token';
+import { postToken } from './yandex/auth/post-token';
+import { dialog } from './yandex/dialog/dialog';
 
 dotenv.config();
 const TOKEN = process.env.TG_BOT_TOKEN;
 const PORT = Number(process.env.PORT);
-if (!TOKEN) {
-  throw new Error('Check environment variables.');
+if (!TOKEN || !PORT) {
+  throw new Error('[SERVER INIT] Проверь переменные среды');
 }
 
-// Fastify server instance
 const server = fastify({ logger: true });
 server.register(fastifyFormbody);
 
@@ -137,9 +136,6 @@ editNote.on('msg', async (ctx) => await ctx.reply('Этот вид файлов 
 editNote.callbackQuery(callbackEnum.CANCEL_EDIT_NOTE, async (ctx) => await cancelEdit(ctx));
 
 const idle = router.route(botState.idle);
-//COMMANDS
-//TODO убрать
-idle.command('folder', async (ctx) => await onFolder(ctx));
 
 //NEW REMINDER HANDLERS
 idle.callbackQuery(
@@ -194,23 +190,11 @@ server.setErrorHandler(async (error) => {
   console.error(error);
 });
 
-server.post('/', async (request, reply) => {
-  const payload: any = request.body;
-
-  if (payload.session.new) {
-    return reply.send({
-      start_account_linking: {},
-      version: '1.0',
-    });
-  }
-});
-
+server.post('/', async (request: any, reply) => dialog(request.body));
 server.get('/auth', async (req, reply) => await getAuth(req, reply));
 server.post('/auth', async (req, reply) => await postAuth(req, reply));
-
 server.post('/token', async (req, reply) => await postToken(req, reply));
 
-// eslint-disable-next-line unusedImports/no-unused-vars
 server.get('/', async (req: FastifyRequest, reply: FastifyReply) => {
   return { status: 'ok', message: 'Сервер работает' };
 });

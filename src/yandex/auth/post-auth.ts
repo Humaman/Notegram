@@ -1,6 +1,8 @@
 import dotenv from 'dotenv';
 import { v4 as uuidv4 } from 'uuid';
 
+import { generateOneTimePassword } from '../../common/create-user';
+
 import { AuthQuery, getAuthQuery } from './auth-query';
 import { validateAuthParams } from './auth-validation';
 dotenv.config();
@@ -17,19 +19,14 @@ export async function postAuth(req, reply) {
   }
 
   const user = await prisma.user.findUnique({ where: { yandex_password: password } });
-  if (!user) {
-    return reply.status(400).send('Invalid password');
-  }
+  if (!user) return reply.status(400).send('Invalid password');
 
   await prisma.user.update({
-    where: { id: user.id, yandex_id_active: false },
-    data: {
-      yandex_id_active: true,
-      yandex_id: 'Пока не знаю где его взять',
-    },
+    where: { id: user.id },
+    data: { yandex_password: generateOneTimePassword(user.tg_id) },
   });
-  // После успешной аутентификации генерируем код авторизации
-  const authCode = uuidv4(); // Здесь генерируется твой код авторизации (например, UUID)
+
+  const authCode = uuidv4();
 
   await prisma.authCode.create({
     data: {
@@ -41,11 +38,9 @@ export async function postAuth(req, reply) {
     },
   });
 
-  // Формируем URL для редиректа с кодом авторизации
   const redirectUrl = new URL(query.redirect_uri);
-  redirectUrl.searchParams.append('code', authCode); // Добавляем параметр code с авторизационным кодом
-  redirectUrl.searchParams.append('state', query.state); // Добавляем параметр state для защиты от CSRF
+  redirectUrl.searchParams.append('code', authCode);
+  redirectUrl.searchParams.append('state', query.state);
 
-  // Выполняем редирект на указанный redirect_uri
   return reply.redirect(redirectUrl.toString());
 }
