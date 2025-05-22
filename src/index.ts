@@ -190,7 +190,7 @@ server.setErrorHandler(async (error) => {
   console.error(error);
 });
 
-server.post('/', async (request: any, reply) => dialog(request.body));
+server.post('/', async (request: any, reply) => dialog(request.body, bot));
 server.get('/auth', async (req, reply) => await getAuth(req, reply));
 server.post('/auth', async (req, reply) => await postAuth(req, reply));
 server.post('/token', async (req, reply) => await postToken(req, reply));
