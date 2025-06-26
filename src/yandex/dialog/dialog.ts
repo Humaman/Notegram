@@ -28,7 +28,12 @@ async function sendTemplateToTG(userId: string, bot: Bot<CustomContext>) {
 export async function dialog(req, bot: Bot<CustomContext>) {
   const accessToken = req?.session?.user?.access_token;
   const intents = req?.request?.nlu?.intents;
-  let tokenData = verifyAccessToken(accessToken);
+  let tokenData;
+  try {
+    tokenData = verifyAccessToken(accessToken);
+  } catch (error) {
+    console.error(error);
+  }
   if (req.session?.new && accessToken) return makeResponce(welcomeMessage);
   if (!accessToken) {
     tokenData = undefined;
